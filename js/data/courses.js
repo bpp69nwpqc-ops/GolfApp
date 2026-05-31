@@ -108,6 +108,41 @@ const COURSES = [
         ]
       }
     ]
+  },
+  {
+    id: 'zwijnaarde',
+    name: 'Executive Club Private Golf Zwijnaarde',
+    region: 'Oost-Vlaanderen',
+    courses: [
+      {
+        id: 'executive-nine',
+        name: 'Executive Nine',
+        holes: 9,
+        par: 28,
+        tees: ['green', 'gold', 'lightblue'],
+        courseRating: {
+          green:     { men: 57.0,  ladies: 59.8 },
+          gold:      { men: 56.4,  ladies: 58.8 },
+          lightblue: { men: 55.2,  ladies: 56.4 }
+        },
+        slope: {
+          green:     { men: 102, ladies:  99 },
+          gold:      { men:  96, ladies: 100 },
+          lightblue: { men:  95, ladies:  83 }
+        },
+        holeData: [
+          { hole: 1, par: 3, meters: { green: 113, gold: 113, lightblue: 113 }, si: { first9: 15, second9: 16 } },
+          { hole: 2, par: 3, meters: { green: 113, gold: 113, lightblue: 113 }, si: { first9:  5, second9:  6 } },
+          { hole: 3, par: 3, meters: { green: 129, gold: 129, lightblue: 129 }, si: { first9:  9, second9: 10 } },
+          { hole: 4, par: 3, meters: { green:  71, gold:  71, lightblue:  71 }, si: { first9: 17, second9: 18 } },
+          { hole: 5, par: 3, meters: { green: 120, gold: 120, lightblue: 120 }, si: { first9: 13, second9: 14 } },
+          { hole: 6, par: 3, meters: { green: 190, gold: 190, lightblue: 133 }, si: { first9:  3, second9:  4 } },
+          { hole: 7, par: 4, meters: { green: 370, gold: 290, lightblue: 231 }, si: { first9:  1, second9:  2 } },
+          { hole: 8, par: 3, meters: { green: 127, gold: 127, lightblue: 127 }, si: { first9: 11, second9: 12 } },
+          { hole: 9, par: 3, meters: { green: 147, gold: 147, lightblue: 147 }, si: { first9:  7, second9:  8 } }
+        ]
+      }
+    ]
   }
 ];
 
@@ -151,12 +186,13 @@ function getCourseSIs(clubId, courseId, totalHoles, playedTwice, tee) {
 function computePlayerCH(player, round) {
   if (player.currentHandicap == null) return 0;
   const course = getCourse(round.clubId, round.courseId);
-  if (!course || !course.slope || !course.courseRating) {
-    return Math.round(player.currentHandicap * round.totalHoles / 18);
-  }
-  const tee   = (round.playerTees && round.playerTees[player.id]) || round.tee || 'yellow';
-  const slope = (course.slope.men && course.slope.men[tee]) || (course.slope.ladies && course.slope.ladies[tee]) || 113;
-  const cr    = (course.courseRating.men && course.courseRating.men[tee]) || (course.courseRating.ladies && course.courseRating.ladies[tee]) || course.par;
-  const ch18  = Scoring.calcCourseHandicap(player.currentHandicap, slope, cr, course.par);
+  if (!course) return Math.round(player.currentHandicap * round.totalHoles / 18);
+  const tee         = (round.playerTees && round.playerTees[player.id]) || round.tee || 'yellow';
+  const teeSlopeObj = course.slope && course.slope[tee];
+  const teeCRObj    = course.courseRating && course.courseRating[tee];
+  const slope  = (teeSlopeObj && (teeSlopeObj.men || teeSlopeObj.ladies)) || 113;
+  const par18  = course.holes === 9 ? course.par * 2 : course.par;
+  const cr18   = (teeCRObj && (teeCRObj.men || teeCRObj.ladies)) || par18;
+  const ch18   = Scoring.calcCourseHandicap(player.currentHandicap, slope, cr18, par18);
   return round.totalHoles === 9 ? Math.round(ch18 / 2) : ch18;
 }

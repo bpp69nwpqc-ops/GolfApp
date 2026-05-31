@@ -155,11 +155,11 @@ body {
 
 .header-back {
   color: var(--white);
-  font-size: 20px;
+  font-size: 26px;
   display: flex;
   align-items: center;
-  padding: 4px;
-  margin-left: -4px;
+  padding: 6px;
+  margin-left: -6px;
 }
 
 /* ─── Home Header ─── */

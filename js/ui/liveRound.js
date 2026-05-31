@@ -1,11 +1,14 @@
 /* ─── Constants ─── */
 const TEE_COLORS = {
-  black:  '#1A1A1A',
-  white:  '#FFFFFF',
-  yellow: '#F5C518',
-  blue:   '#1565C0',
-  red:    '#C62828',
-  orange: '#E65100'
+  black:     '#1A1A1A',
+  white:     '#FFFFFF',
+  yellow:    '#F5C518',
+  blue:      '#1565C0',
+  red:       '#C62828',
+  orange:    '#E65100',
+  green:     '#2E7D32',
+  gold:      '#FFD700',
+  lightblue: '#64B5F6'
 };
 
 const FORMAT_INFO = {
