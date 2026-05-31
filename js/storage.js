@@ -37,3 +37,10 @@ const Storage = {
     return Date.now().toString(36) + Math.random().toString(36).slice(2);
   }
 };
+
+// Returns profile + friends merged — use this everywhere players are needed for a round
+function getAllPlayers() {
+  const profile = Storage.getProfile();
+  const friends = Storage.getPlayers();
+  return profile ? [profile, ...friends] : friends;
+}

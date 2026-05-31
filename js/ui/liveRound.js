@@ -373,7 +373,7 @@ const LiveRoundUI = {
 
   /* Step 6 — Team Assignment (team formats only) */
   _renderStep6() {
-    const players = Storage.getPlayers().filter(p => this.setup.playerIds.includes(p.id));
+    const players = getAllPlayers().filter(p => this.setup.playerIds.includes(p.id));
     const teams   = this.setup.teams;
     const unassigned = players.filter(p => !teams.a.includes(p.id) && !teams.b.includes(p.id));
     const renderTeamCol = (teamKey, label) => {
@@ -439,7 +439,7 @@ const LiveRoundUI = {
     const holeInfo = getHoleData(round.clubId, round.courseId, holeNum, round.playedTwice, round.tee);
     if (!holeInfo) return `<div class="empty-state"><p class="empty-title">Course data error</p></div>`;
 
-    const players  = Storage.getPlayers().filter(p => round.playerIds.includes(p.id));
+    const players  = getAllPlayers().filter(p => round.playerIds.includes(p.id));
     const course   = getCourse(round.clubId, round.courseId);
     const club     = getClub(round.clubId);
     const fmtInfo  = FORMAT_INFO[round.format] || { name: round.format };
@@ -541,7 +541,7 @@ const LiveRoundUI = {
      SUMMARY / FINISH SCREEN
   ════════════════════════════════════════ */
   _renderSummary(round) {
-    const players  = Storage.getPlayers().filter(p => round.playerIds.includes(p.id));
+    const players  = getAllPlayers().filter(p => round.playerIds.includes(p.id));
     const course   = getCourse(round.clubId, round.courseId);
     const club     = getClub(round.clubId);
     const pars     = getCoursePars(round.clubId, round.courseId, round.totalHoles);
@@ -803,8 +803,9 @@ const LiveRoundUI = {
         const rounds = Storage.getRounds();
         // Determine winner before saving
         const courseData = getCourse(round.clubId, round.courseId);
+        const allP = getAllPlayers().filter(p => round.playerIds.includes(p.id));
         round.winner = courseData
-          ? Scoring.determineWinner(round, [], courseData.holeData)
+          ? Scoring.determineWinner(round, allP, courseData.holeData)
           : null;
         rounds.push(round);
         Storage.saveRounds(rounds);

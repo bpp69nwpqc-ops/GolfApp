@@ -44,7 +44,7 @@ const HistoryUI = {
       const club    = getClub(r.clubId);
       const course  = getCourse(r.clubId, r.courseId);
       const date    = new Date(r.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-      const players = Storage.getPlayers();
+      const players = getAllPlayers();
       const winner  = r.winner ? players.find(p => p.id === r.winner) : null;
       return `
         <div class="card round-row" data-action="view-round" data-round-id="${r.id}">
@@ -62,7 +62,7 @@ const HistoryUI = {
   _renderDetail(round) {
     const club    = getClub(round.clubId);
     const course  = getCourse(round.clubId, round.courseId);
-    const players = Storage.getPlayers().filter(p => round.playerIds.includes(p.id));
+    const players = getAllPlayers().filter(p => round.playerIds.includes(p.id));
     const pars    = getCoursePars(round.clubId, round.courseId, round.totalHoles);
     const fmtLabel = { strokeplay: 'Strokeplay', stableford: 'Stableford', matchplay: 'Matchplay', scramble: 'Scramble', bestball: 'Best Ball' };
     const fmtName  = fmtLabel[round.format] || round.format;
