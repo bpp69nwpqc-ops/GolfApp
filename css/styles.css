@@ -1350,87 +1350,89 @@ body {
 
 /* ─── Transposed Scorecard Table ─── */
 .st-outer {
-  border: 0.5px solid var(--border);
   border-radius: var(--radius-card);
   overflow: hidden;
   background: var(--white);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
 }
 
 .scorecard-table-v {
   width: 100%;
   border-collapse: collapse;
-  font-size: 12px;
+  font-size: 13px;
 }
 
+/* Header */
 .scorecard-table-v thead th {
   background: var(--green-dark);
   color: rgba(255,255,255,0.9);
   text-align: center;
-  border-right: 0.5px solid rgba(255,255,255,0.12);
+  border-right: 1px solid rgba(255,255,255,0.1);
 }
 
 .scorecard-table-v th.col-label {
   font-size: 9px;
-  font-weight: 600;
-  letter-spacing: 0.6px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
   text-transform: uppercase;
   vertical-align: bottom;
-  width: 30px;
+  width: 32px;
   padding: 0 4px 10px;
+  color: rgba(255,255,255,0.6);
 }
 
 .scorecard-table-v th.col-player {
-  height: 72px;
+  height: 76px;
   vertical-align: bottom;
-  padding: 0 4px 6px;
-  min-width: 44px;
+  padding: 0 6px 8px;
+  min-width: 52px;
 }
 
 .player-th-name {
   display: block;
   writing-mode: vertical-rl;
   transform: rotate(180deg);
-  font-size: 11px;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 700;
   white-space: nowrap;
   overflow: hidden;
-  max-height: 64px;
-  color: rgba(255,255,255,0.85);
+  max-height: 68px;
+  color: var(--white);
+  letter-spacing: 0.2px;
 }
 
-.player-th-name.is-winner {
-  color: #FFD97D;
-}
-
+/* Body rows */
 .scorecard-table-v tbody td {
-  padding: 6px 4px;
+  padding: 8px 4px;
   text-align: center;
-  border-bottom: 0.5px solid var(--border);
-  border-right: 0.5px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  border-right: 1px solid var(--border);
 }
 
-.scorecard-table-v tr:nth-child(even) td.cell-s {
-  background-color: #FAFAF8;
+.scorecard-table-v tr:nth-child(even) {
+  background: #FAFAF8;
 }
 
 .scorecard-table-v td.cell-h {
-  background: #EEEBE5;
+  background: #EDEBE6 !important;
   color: var(--text-secondary);
-  font-size: 10px;
-  font-weight: 600;
-  width: 26px;
+  font-size: 11px;
+  font-weight: 700;
+  width: 28px;
+  border-right: 2px solid var(--border);
 }
 
 .scorecard-table-v td.cell-p {
-  background: #EEEBE5;
-  color: #6B6660;
-  font-size: 12px;
-  font-weight: 500;
-  width: 28px;
+  background: #EDEBE6 !important;
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 600;
+  width: 32px;
+  border-right: 2px solid var(--border);
 }
 
 .scorecard-table-v td.cell-s {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--text-primary);
 }
@@ -1445,39 +1447,35 @@ body {
   color: var(--score-over-tx);
 }
 
+/* OUT / IN subtotaal */
 .scorecard-table-v tr.row-sub td {
-  background: #E8F0E8;
+  background: #EAF2EA !important;
   color: var(--green-dark);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
-  border-top: 1px solid #C8DCC8;
-  border-bottom: 1px solid #C8DCC8;
+  border-top: 2px solid #B8D4B8;
+  border-bottom: 2px solid #B8D4B8;
+  padding: 7px 4px;
 }
 
-.scorecard-table-v tr.row-sub td.cell-h,
-.scorecard-table-v tr.row-sub td.cell-p {
-  background: #D6E8D6;
-}
-
+/* TOT rij — volledig donkergroen */
 .scorecard-table-v tr.row-tot td {
-  background: var(--green-dark);
-  color: rgba(255,255,255,0.9);
-  font-size: 13px;
+  background: var(--green-dark) !important;
+  color: var(--white);
+  font-size: 14px;
   font-weight: 700;
-  border-color: transparent;
-  padding: 9px 4px;
+  border-color: var(--green-dark);
+  padding: 10px 4px;
+  border-right: 1px solid rgba(255,255,255,0.15);
 }
 
 .scorecard-table-v tr.row-tot td.cell-h,
 .scorecard-table-v tr.row-tot td.cell-p {
-  color: rgba(255,255,255,0.6);
+  color: rgba(255,255,255,0.55);
   font-size: 10px;
-  font-weight: 600;
-}
-
-.scorecard-table-v tr.row-tot td.cell-winner {
-  color: #FFD97D;
-  font-weight: 800;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
 /* ─── Profile Header Button ─── */
