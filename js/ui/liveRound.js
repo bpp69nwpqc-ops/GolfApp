@@ -32,7 +32,7 @@ function buildScorecardTable(round, players, pars, scoreTotals, winnerId) {
 
   const playerHeaders = players.map(p => {
     return `<th class="col-player">
-      <span class="player-th-name">${p.name}</span>
+      <span class="player-th-name">${getDisplayName(p)}</span>
     </th>`;
   }).join('');
 
@@ -140,17 +140,18 @@ const LiveRoundUI = {
     courseId: null,
     totalHoles: 9,
     playedTwice: false,
-    tee: null,
     format: null,
     playerIds: [],
+    playerTees: {},
     teams: { a: [], b: [] }
   },
 
   subView: 'setup', // 'setup' | 'scorecard' | 'summary'
+  metersCycleIndex: 0,
 
   resetSetup() {
     const profile = Storage.getProfile();
-    this.setup = { step: 1, clubId: null, courseId: null, totalHoles: 9, playedTwice: false, tee: null, format: null, playerIds: profile ? [profile.id] : [], teams: { a: [], b: [] } };
+    this.setup = { step: 1, clubId: null, courseId: null, totalHoles: 9, playedTwice: false, format: null, playerIds: profile ? [profile.id] : [], playerTees: {}, teams: { a: [], b: [] } };
     this.subView = 'setup';
   },
 
@@ -171,12 +172,12 @@ const LiveRoundUI = {
   ════════════════════════════════════════ */
   _renderSetupStep() {
     switch (this.setup.step) {
-      case 1: return this._renderStep1();
-      case 2: return this._renderStep2();
-      case 3: return this._renderStep3();
-      case 4: return this._renderStep4();
-      case 5: return this._renderStep5();
-      case 6: return this._renderStep6();
+      case 1: return this._renderStep1();  // Club
+      case 2: return this._renderStep2();  // Course + Holes
+      case 3: return this._renderStep3();  // Format
+      case 4: return this._renderStep4();  // Players
+      case 5: return this._renderStep5();  // Tees (per player)
+      case 6: return this._renderStep6();  // Teams (team formats only)
       default: return this._renderStep1();
     }
   },
@@ -275,41 +276,8 @@ const LiveRoundUI = {
     `;
   },
 
-  /* Step 3 — Tee Color */
+  /* Step 3 — Format */
   _renderStep3() {
-    const course = getCourse(this.setup.clubId, this.setup.courseId);
-    if (!course) return this._renderStep2();
-    return `
-      <div class="setup-screen">
-        <div class="setup-step-header">
-          <div class="setup-step-top">
-            <button class="header-back" data-action="setup-back"><i class="ti ti-arrow-left"></i></button>
-            <span class="setup-step-title">Select Tee</span>
-          </div>
-          <div class="setup-step-subtitle">Choose your tee color</div>
-        </div>
-        ${this._summaryBar()}
-        <div class="setup-content">
-          <div class="tee-chips-grid">
-            ${course.tees.map(tee => {
-              const tc = TEE_COLORS[tee] || '#888';
-              const isWhite = tee === 'white';
-              return `
-                <div class="tee-chip-item ${this.setup.tee === tee ? 'selected' : ''}"
-                     data-action="setup-select-tee" data-tee="${tee}">
-                  <div class="tee-circle ${isWhite ? 'white-tee' : ''}" style="background-color:${tc}"></div>
-                  <span class="tee-chip-label">${tee.charAt(0).toUpperCase() + tee.slice(1)}</span>
-                </div>
-              `;
-            }).join('')}
-          </div>
-        </div>
-      </div>
-    `;
-  },
-
-  /* Step 4 — Format */
-  _renderStep4() {
     return `
       <div class="setup-screen">
         <div class="setup-step-header">
@@ -335,13 +303,12 @@ const LiveRoundUI = {
     `;
   },
 
-  /* Step 5 — Players */
-  _renderStep5() {
+  /* Step 4 — Players */
+  _renderStep4() {
     const profile  = Storage.getProfile();
     const friends  = Storage.getPlayers();
     const selected = this.setup.playerIds;
-    const isTeam   = TEAM_FORMATS.includes(this.setup.format);
-    const canStart = selected.length >= 1;
+    const canContinue = selected.length >= 1;
 
     const renderPlayer = (p, isMe) => {
       const initials   = p.name.split(' ').map(n => n[0] || '').join('').toUpperCase().slice(0, 2);
@@ -385,9 +352,64 @@ const LiveRoundUI = {
           }
         </div>
         <div class="setup-footer">
+          <button class="btn-primary" data-action="setup-continue" ${!canContinue ? 'disabled' : ''}>Continue</button>
+        </div>
+      </div>
+    `;
+  },
+
+  /* Step 5 — Per-player tee selection */
+  _renderStep5() {
+    const s       = this.setup;
+    const course  = getCourse(s.clubId, s.courseId);
+    if (!course) return this._renderStep4();
+    const players = getAllPlayers().filter(p => s.playerIds.includes(p.id));
+    const isTeam  = TEAM_FORMATS.includes(s.format);
+    const allHaveTee = players.every(p => !!s.playerTees[p.id]);
+
+    return `
+      <div class="setup-screen">
+        <div class="setup-step-header">
+          <div class="setup-step-top">
+            <button class="header-back" data-action="setup-back"><i class="ti ti-arrow-left"></i></button>
+            <span class="setup-step-title">Select Tees</span>
+          </div>
+          <div class="setup-step-subtitle">Choose each player's tee</div>
+        </div>
+        ${this._summaryBar()}
+        <div class="setup-content">
+          ${players.map(p => {
+            const initials = p.name.split(' ').map(n => n[0] || '').join('').toUpperCase().slice(0, 2);
+            const selTee   = s.playerTees[p.id] || null;
+            return `
+              <div class="player-tee-row card">
+                <div class="player-tee-identity">
+                  <div class="player-avatar-sm" style="background-color:${p.avatarColor}">${initials}</div>
+                  <span class="player-tee-name">${p.name}</span>
+                </div>
+                <div class="tee-mini-row">
+                  ${course.tees.map(tee => {
+                    const tc = TEE_COLORS[tee] || '#888';
+                    const isWhite = tee === 'white';
+                    const isSel   = selTee === tee;
+                    return `
+                      <button class="tee-mini-btn ${isSel ? 'selected' : ''}"
+                              data-action="setup-select-player-tee"
+                              data-player-id="${p.id}" data-tee="${tee}"
+                              title="${tee.charAt(0).toUpperCase() + tee.slice(1)}">
+                        <div class="tee-mini-circle ${isWhite ? 'white-tee' : ''}" style="background-color:${tc}"></div>
+                      </button>
+                    `;
+                  }).join('')}
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+        <div class="setup-footer">
           ${isTeam
-            ? `<button class="btn-primary" data-action="setup-continue" ${!canStart ? 'disabled' : ''}>Continue to Teams</button>`
-            : `<button class="btn-primary" data-action="start-round" ${!canStart ? 'disabled' : ''}>Start Round</button>`
+            ? `<button class="btn-primary" data-action="setup-continue" ${!allHaveTee ? 'disabled' : ''}>Continue to Teams</button>`
+            : `<button class="btn-primary" data-action="start-round" ${!allHaveTee ? 'disabled' : ''}>Start Round</button>`
           }
         </div>
       </div>
@@ -477,12 +499,20 @@ const LiveRoundUI = {
       }
     });
 
-    // Extra strokes per player for this hole
+    // Extra strokes per player for this hole (uses each player's own tee)
     const playerExtras = {};
     players.forEach(p => {
       const ch = computePlayerCH(p, round);
       playerExtras[p.id] = Scoring.holeStrokeAllowance(ch, holeInfo.si, round.totalHoles);
     });
+
+    // Meters display: cycle through players on tap
+    const profile   = Storage.getProfile();
+    const refIdx    = Math.min(this.metersCycleIndex, players.length - 1);
+    const refPlayer = players[refIdx] || players[0];
+    const refTee    = (round.playerTees && round.playerTees[refPlayer.id]) || round.tee || 'yellow';
+    const refHole   = getHoleData(round.clubId, round.courseId, holeNum, round.playedTwice, refTee);
+    const refMeters = refHole ? refHole.meters : holeInfo.meters;
 
     return `
       <div class="scorecard-screen">
@@ -497,9 +527,9 @@ const LiveRoundUI = {
               <span class="hole-info-label">Par</span>
               <span class="hole-info-value">${holeInfo.par}</span>
             </div>
-            <div class="hole-info-item">
-              <span class="hole-info-label">Meters</span>
-              <span class="hole-info-value">${holeInfo.meters}</span>
+            <div class="hole-info-item" data-action="cycle-meters" style="cursor:pointer;user-select:none">
+              <span class="hole-info-label" id="meters-label">${getDisplayName(refPlayer)}</span>
+              <span class="hole-info-value" id="meters-display">${refMeters}</span>
             </div>
             <div class="hole-info-item">
               <span class="hole-info-label">SI</span>
@@ -544,7 +574,7 @@ const LiveRoundUI = {
           <div class="player-card-left">
             <div class="player-avatar-sm" style="background-color:${player.avatarColor}">${initials}</div>
             <div>
-              <div class="player-name-text">${player.name}</div>
+              <div class="player-name-text">${getDisplayName(player)}</div>
               <div class="player-hcp-text">
                 ${player.currentHandicap != null ? 'HCP ' + player.currentHandicap.toFixed(1) : ''}
                 ${extraBadge}
@@ -646,7 +676,7 @@ const LiveRoundUI = {
       case 'setup-select-club': {
         const id = target.dataset.clubId;
         if (id !== s.clubId) {
-          s.clubId = id; s.courseId = null; s.tee = null; s.format = null; s.playerIds = [];
+          s.clubId = id; s.courseId = null; s.format = null; s.playerIds = []; s.playerTees = {};
         }
         s.step = 2;
         App.renderContent();
@@ -656,8 +686,7 @@ const LiveRoundUI = {
       case 'setup-select-course': {
         const id = target.dataset.courseId;
         if (id !== s.courseId) {
-          s.courseId = id; s.tee = null; s.format = null; s.playerIds = [];
-          // Default holes based on course
+          s.courseId = id; s.format = null; s.playerIds = []; s.playerTees = {};
           const c = getCourse(s.clubId, id);
           if (c) { s.totalHoles = c.holes; s.playedTwice = false; }
         }
@@ -674,16 +703,18 @@ const LiveRoundUI = {
         break;
       }
 
-      case 'setup-continue':
+      case 'setup-continue': {
         if (target.disabled) return;
+        // Moving from Players (step 4) to Tees (step 5): pre-fill preferred tees
+        if (s.step === 4) {
+          const course = getCourse(s.clubId, s.courseId);
+          getAllPlayers().filter(p => s.playerIds.includes(p.id)).forEach(p => {
+            if (!s.playerTees[p.id] && p.preferredTee && course && course.tees.includes(p.preferredTee)) {
+              s.playerTees[p.id] = p.preferredTee;
+            }
+          });
+        }
         s.step++;
-        App.renderContent();
-        break;
-
-      case 'setup-select-tee': {
-        const tee = target.dataset.tee;
-        if (tee !== s.tee) { s.tee = tee; s.format = null; s.playerIds = []; }
-        s.step = 4;
         App.renderContent();
         break;
       }
@@ -694,8 +725,17 @@ const LiveRoundUI = {
           const profile = Storage.getProfile();
           s.format    = fmt;
           s.playerIds = profile ? [profile.id] : [];
+          s.playerTees = {};
         }
-        s.step = 5;
+        s.step = 4;
+        App.renderContent();
+        break;
+      }
+
+      case 'setup-select-player-tee': {
+        const pid = target.closest('[data-player-id]').dataset.playerId;
+        const tee = target.dataset.tee;
+        s.playerTees[pid] = tee;
         App.renderContent();
         break;
       }
@@ -746,17 +786,23 @@ const LiveRoundUI = {
   _startRound() {
     const s = this.setup;
     const course = getCourse(s.clubId, s.courseId);
-    if (!course || !s.tee || !s.format || s.playerIds.length === 0) return;
+    if (!course || !s.format || s.playerIds.length === 0) return;
+    if (s.playerIds.some(id => !s.playerTees[id])) return; // all players need a tee
 
     const scores = {};
     s.playerIds.forEach(id => { scores[id] = new Array(s.totalHoles).fill(null); });
+
+    // Build playerTees for round (only selected players)
+    const playerTees = {};
+    s.playerIds.forEach(id => { playerTees[id] = s.playerTees[id]; });
 
     const round = {
       id: Storage.generateId(),
       date: new Date().toISOString(),
       clubId:      s.clubId,
       courseId:    s.courseId,
-      tee:         s.tee,
+      tee:         playerTees[s.playerIds[0]] || 'yellow', // fallback for old rounds
+      playerTees,
       totalHoles:  s.totalHoles,
       playedTwice: s.playedTwice,
       format:      s.format,
@@ -767,6 +813,24 @@ const LiveRoundUI = {
       completed:   false
     };
 
+    // Save preferred tee back to each player/profile
+    const allP = getAllPlayers();
+    s.playerIds.forEach(id => {
+      const tee = playerTees[id];
+      const profile = Storage.getProfile();
+      if (profile && profile.id === id) {
+        Storage.saveProfile({ ...profile, preferredTee: tee });
+      } else {
+        const players = Storage.getPlayers();
+        const idx = players.findIndex(p => p.id === id);
+        if (idx >= 0) {
+          players[idx] = { ...players[idx], preferredTee: tee };
+          Storage.savePlayers(players);
+        }
+      }
+    });
+
+    this.metersCycleIndex = 0;
     Storage.saveActiveRound(round);
     this.subView = 'scorecard';
     App.renderContent();
@@ -779,7 +843,8 @@ const LiveRoundUI = {
     if (!round) return;
 
     const holeNum  = round.currentHole || 1;
-    const holeInfo = getHoleData(round.clubId, round.courseId, holeNum, round.playedTwice, round.tee);
+    const playerTee = (round.playerTees && round.playerTees[playerId]) || round.tee || 'yellow';
+    const holeInfo = getHoleData(round.clubId, round.courseId, holeNum, round.playedTwice, playerTee);
     if (!holeInfo) return;
 
     let current = round.scores[playerId] ? round.scores[playerId][holeNum - 1] : null;
@@ -812,9 +877,23 @@ const LiveRoundUI = {
     if (!round) return;
 
     switch (action) {
+      case 'cycle-meters': {
+        const players = getAllPlayers().filter(p => round.playerIds.includes(p.id));
+        this.metersCycleIndex = (this.metersCycleIndex + 1) % players.length;
+        const p   = players[this.metersCycleIndex];
+        const tee = (round.playerTees && round.playerTees[p.id]) || round.tee || 'yellow';
+        const hd  = getHoleData(round.clubId, round.courseId, round.currentHole, round.playedTwice, tee);
+        const mEl = document.getElementById('meters-display');
+        const lEl = document.getElementById('meters-label');
+        if (mEl) mEl.textContent = hd ? hd.meters : '—';
+        if (lEl) lEl.textContent = getDisplayName(p);
+        break;
+      }
+
       case 'next-hole':
         if (round.currentHole < round.totalHoles) {
           round.currentHole++;
+          this.metersCycleIndex = 0;
           Storage.saveActiveRound(round);
           App.renderContent();
         }
@@ -823,6 +902,7 @@ const LiveRoundUI = {
       case 'prev-hole':
         if (round.currentHole > 1) {
           round.currentHole--;
+          this.metersCycleIndex = 0;
           Storage.saveActiveRound(round);
           App.renderContent();
         }

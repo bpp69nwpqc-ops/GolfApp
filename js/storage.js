@@ -44,3 +44,8 @@ function getAllPlayers() {
   const friends = Storage.getPlayers();
   return profile ? [profile, ...friends] : friends;
 }
+
+// Returns nickname if set, otherwise full name
+function getDisplayName(player) {
+  return (player.nickname && player.nickname.trim()) ? player.nickname.trim() : player.name;
+}

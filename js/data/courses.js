@@ -154,7 +154,7 @@ function computePlayerCH(player, round) {
   if (!course || !course.slope || !course.courseRating) {
     return Math.round(player.currentHandicap * round.totalHoles / 18);
   }
-  const tee   = round.tee;
+  const tee   = (round.playerTees && round.playerTees[player.id]) || round.tee || 'yellow';
   const slope = (course.slope.men && course.slope.men[tee]) || (course.slope.ladies && course.slope.ladies[tee]) || 113;
   const cr    = (course.courseRating.men && course.courseRating.men[tee]) || (course.courseRating.ladies && course.courseRating.ladies[tee]) || course.par;
   const ch18  = Scoring.calcCourseHandicap(player.currentHandicap, slope, cr, course.par);

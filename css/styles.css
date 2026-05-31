@@ -1744,6 +1744,63 @@ body {
 .course-stat-avg.under { color: var(--score-under-tx); }
 .course-stat-avg.over  { color: var(--score-over-tx); }
 
+/* ─── Per-player tee selection (setup step 5) ─── */
+.player-tee-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+}
+
+.player-tee-identity {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 100px;
+}
+
+.player-tee-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.tee-mini-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.tee-mini-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid transparent;
+  background: none;
+  padding: 0;
+  transition: border-color 0.15s;
+}
+
+.tee-mini-btn.selected {
+  border-color: var(--text-primary);
+  box-shadow: 0 0 0 2px var(--white), 0 0 0 4px var(--text-primary);
+}
+
+.tee-mini-circle {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+}
+
+.tee-mini-circle.white-tee {
+  border: 1.5px solid #ccc;
+}
+
 /* ─── Extra strokes badge (live scorecard) ─── */
 .extra-strokes-badge {
   display: inline-block;

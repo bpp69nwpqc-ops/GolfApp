@@ -31,7 +31,7 @@ const HomeUI = {
           ${profile ? this._handicapCard(profile) : this._emptyHandicapCard()}
           ${this._formatsCard()}
         </div>
-        <div style="text-align:center;padding:8px 0 16px;font-size:10px;color:var(--text-secondary);opacity:0.5">v12</div>
+        <div style="text-align:center;padding:8px 0 16px;font-size:10px;color:var(--text-secondary);opacity:0.5">v13</div>
       </div>
     `;
   },

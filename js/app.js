@@ -122,8 +122,8 @@ const App = {
       return;
     }
 
-    // Round navigation + finish/save
-    if (['next-hole', 'prev-hole', 'finish-round', 'save-round', 'discard-round'].includes(action)) {
+    // Round navigation + finish/save + meters cycling
+    if (['next-hole', 'prev-hole', 'finish-round', 'save-round', 'discard-round', 'cycle-meters'].includes(action)) {
       LiveRoundUI.handleRoundAction(action, target);
       return;
     }

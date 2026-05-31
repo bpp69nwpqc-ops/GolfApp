@@ -81,6 +81,11 @@ const PlayersUI = {
                    value="${player ? this._esc(player.name) : ''}" autocomplete="off">
           </div>
           <div class="form-group">
+            <label class="form-label">Nickname <span style="font-weight:400;color:var(--text-secondary)">(optional, shown on scorecard)</span></label>
+            <input id="player-nickname" type="text" class="form-input" placeholder="e.g. Papa"
+                   value="${player && player.nickname ? this._esc(player.nickname) : ''}" autocomplete="off">
+          </div>
+          <div class="form-group">
             <label class="form-label">Handicap Index</label>
             <input id="player-hcp" type="number" class="form-input" placeholder="e.g. 12.4"
                    step="0.1" min="0" max="54"
@@ -138,14 +143,16 @@ const PlayersUI = {
       }
 
       case 'players-save': {
-        const name   = (document.getElementById('player-name').value || '').trim();
-        const hcpStr = document.getElementById('player-hcp').value;
-        const hcp    = hcpStr !== '' ? parseFloat(hcpStr) : null;
-        const color  = this._selectedColor();
+        const name     = (document.getElementById('player-name').value || '').trim();
+        const nickname = (document.getElementById('player-nickname').value || '').trim() || null;
+        const hcpStr   = document.getElementById('player-hcp').value;
+        const hcp      = hcpStr !== '' ? parseFloat(hcpStr) : null;
+        const color    = this._selectedColor();
         if (!name) { alert('Please enter a player name.'); return; }
         const player = {
           id: Storage.generateId(),
           name,
+          nickname,
           avatarColor: color,
           currentHandicap: hcp,
           handicapHistory: hcp != null ? [{ date: new Date().toISOString().slice(0, 10), value: hcp }] : [],
@@ -166,10 +173,11 @@ const PlayersUI = {
         break;
 
       case 'players-update': {
-        const name   = (document.getElementById('player-name').value || '').trim();
-        const hcpStr = document.getElementById('player-hcp').value;
-        const hcp    = hcpStr !== '' ? parseFloat(hcpStr) : null;
-        const color  = this._selectedColor();
+        const name     = (document.getElementById('player-name').value || '').trim();
+        const nickname = (document.getElementById('player-nickname').value || '').trim() || null;
+        const hcpStr   = document.getElementById('player-hcp').value;
+        const hcp      = hcpStr !== '' ? parseFloat(hcpStr) : null;
+        const color    = this._selectedColor();
         if (!name) { alert('Please enter a player name.'); return; }
         const players = Storage.getPlayers();
         const idx     = players.findIndex(p => p.id === this.editingPlayerId);
@@ -179,6 +187,7 @@ const PlayersUI = {
           players[idx] = {
             ...prev,
             name,
+            nickname,
             avatarColor: color,
             currentHandicap: hcp,
             handicapHistory: hcpChanged
