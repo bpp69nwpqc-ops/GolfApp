@@ -610,13 +610,13 @@ const LiveRoundUI = {
      SUMMARY / FINISH SCREEN
   ════════════════════════════════════════ */
   _renderSummary(round) {
-    const players  = getAllPlayers().filter(p => round.playerIds.includes(p.id));
-    const course   = getCourse(round.clubId, round.courseId);
-    const club     = getClub(round.clubId);
-    const pars     = getCoursePars(round.clubId, round.courseId, round.totalHoles);
-    const winnerId = Scoring.determineWinner(round, players, course?.holeData || []);
-    const winner   = winnerId ? players.find(p => p.id === winnerId) : null;
-    const fmtInfo  = FORMAT_INFO[round.format] || { name: round.format };
+    const players    = getAllPlayers().filter(p => round.playerIds.includes(p.id));
+    const course     = getCourse(round.clubId, round.courseId);
+    const club       = getClub(round.clubId);
+    const pars       = getCoursePars(round.clubId, round.courseId, round.totalHoles);
+    const winnerIds  = Scoring.determineWinners(round, players, course ? course.holeData : []);
+    const winners    = winnerIds.map(id => players.find(p => p.id === id)).filter(Boolean);
+    const fmtInfo    = FORMAT_INFO[round.format] || { name: round.format };
 
     const scoreTotals = {};
     players.forEach(p => {
@@ -626,8 +626,8 @@ const LiveRoundUI = {
         : Scoring.totalGross(scores, pars);
     });
 
-    const winnerDetail = winner
-      ? (round.format === 'stableford' ? `${scoreTotals[winner.id]} pts` : `${scoreTotals[winner.id]} strokes`)
+    const winnerDetail = winners.length > 0
+      ? (round.format === 'stableford' ? `${scoreTotals[winners[0].id]} pts` : `${scoreTotals[winners[0].id]} strokes`)
       : '';
 
     return `
@@ -637,12 +637,12 @@ const LiveRoundUI = {
           <div class="summary-header-sub">${club ? club.name : ''} · ${course ? course.name : ''} · ${round.totalHoles} holes</div>
         </div>
 
-        ${winner ? `
+        ${winners.length > 0 ? `
           <div class="winner-banner">
             <div class="winner-trophy">🏆</div>
             <div>
-              <div class="winner-label">Winner</div>
-              <div class="winner-name">${winner.name}</div>
+              <div class="winner-label">${winners.length > 1 ? 'Winners' : 'Winner'}</div>
+              <div class="winner-name">${winners.map(w => getDisplayName(w)).join(' · ')}</div>
               <div class="winner-detail">${winnerDetail} · ${fmtInfo.name}</div>
             </div>
           </div>
@@ -655,7 +655,7 @@ const LiveRoundUI = {
         `}
 
         <div style="padding:16px">
-          ${buildScorecardTable(round, players, pars, scoreTotals, winnerId)}
+          ${buildScorecardTable(round, players, pars, scoreTotals, winnerIds[0] || null)}
         </div>
 
         <div class="summary-actions">
@@ -923,12 +923,11 @@ const LiveRoundUI = {
 
       case 'save-round': {
         const rounds = Storage.getRounds();
-        // Determine winner before saving
         const courseData = getCourse(round.clubId, round.courseId);
         const allP = getAllPlayers().filter(p => round.playerIds.includes(p.id));
-        round.winner = courseData
-          ? Scoring.determineWinner(round, allP, courseData.holeData)
-          : null;
+        const winnerIds = courseData ? Scoring.determineWinners(round, allP, courseData.holeData) : [];
+        round.winners = winnerIds;
+        round.winner  = winnerIds[0] || null;
         rounds.push(round);
         Storage.saveRounds(rounds);
         Storage.clearActiveRound();

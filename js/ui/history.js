@@ -44,15 +44,19 @@ const HistoryUI = {
       const club    = getClub(r.clubId);
       const course  = getCourse(r.clubId, r.courseId);
       const date    = new Date(r.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-      const players = getAllPlayers();
-      const winner  = r.winner ? players.find(p => p.id === r.winner) : null;
+      const allP      = getAllPlayers();
+      const winnerIds = r.winners || (r.winner ? [r.winner] : []);
+      const winnerNames = winnerIds.map(id => { const p = allP.find(p => p.id === id); return p ? getDisplayName(p) : null; }).filter(Boolean);
+      const winnerHtml  = winnerNames.length === 0 ? ''
+        : winnerNames.length === 1 ? `<span style="font-size:12px;color:var(--gold);font-weight:600;">🏆 ${winnerNames[0]}</span>`
+        : `<span style="font-size:12px;color:var(--gold);font-weight:600;">🏆 ${winnerNames[0]} +${winnerNames.length - 1}</span>`;
       return `
         <div class="card round-row" data-action="view-round" data-round-id="${r.id}">
           <div class="round-row-title">${club ? club.name : r.clubId}</div>
           <div class="round-row-meta">${date} · ${course ? course.name : ''} · ${r.totalHoles} holes</div>
           <div style="display:flex; align-items:center; justify-content:space-between; margin-top:6px;">
             <span class="format-badge format-${r.format}">${fmtLabel[r.format] || r.format}</span>
-            ${winner ? `<span style="font-size:12px; color:var(--gold); font-weight:600;">🏆 ${winner.name}</span>` : ''}
+            ${winnerHtml}
           </div>
         </div>
       `;
@@ -76,7 +80,8 @@ const HistoryUI = {
         : Scoring.totalGross(scores, pars);
     });
 
-    const winner = round.winner ? players.find(p => p.id === round.winner) : null;
+    const winnerIds = round.winners || (round.winner ? [round.winner] : []);
+    const winners   = winnerIds.map(id => players.find(p => p.id === id)).filter(Boolean);
 
     return `
       <div class="summary-screen">
@@ -98,18 +103,18 @@ const HistoryUI = {
             </div>
           </div>
 
-          ${winner ? `
+          ${winners.length > 0 ? `
             <div class="winner-banner">
               <div class="winner-trophy">🏆</div>
               <div>
-                <div class="winner-label">Winner</div>
-                <div class="winner-name">${winner.name}</div>
+                <div class="winner-label">${winners.length > 1 ? 'Winners' : 'Winner'}</div>
+                <div class="winner-name">${winners.map(w => getDisplayName(w)).join(' · ')}</div>
                 <div class="winner-detail">${fmtName}</div>
               </div>
             </div>
           ` : ''}
 
-          ${buildScorecardTable(round, players, pars, scoreTotals, round.winner)}
+          ${buildScorecardTable(round, players, pars, scoreTotals, winnerIds[0] || null)}
 
           <button class="btn-danger" data-action="history-delete" data-round-id="${round.id}">Delete Round</button>
         </div>

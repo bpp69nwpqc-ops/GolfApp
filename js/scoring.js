@@ -39,32 +39,29 @@ const Scoring = {
   },
 
   determineWinner(round, players, courseHoles) {
-    if (!round.playerIds || round.playerIds.length === 0) return null;
+    const ids = this.determineWinners(round, players, courseHoles);
+    return ids.length > 0 ? ids[0] : null;
+  },
+
+  determineWinners(round, players, courseHoles) {
+    if (!round.playerIds || round.playerIds.length === 0) return [];
 
     const pars = Array.from({ length: round.totalHoles }, (_, i) => {
       return courseHoles[i % courseHoles.length].par;
     });
 
     if (round.format === 'strokeplay') {
-      let best = Infinity;
-      let winnerId = null;
-      round.playerIds.forEach(id => {
-        const total = this.totalGross(round.scores[id] || [], pars);
-        if (total < best) { best = total; winnerId = id; }
-      });
-      return winnerId;
+      const totals = round.playerIds.map(id => ({ id, score: this.totalGross(round.scores[id] || [], pars) }));
+      const best   = Math.min(...totals.map(t => t.score));
+      return totals.filter(t => t.score === best).map(t => t.id);
     }
 
     if (round.format === 'stableford') {
-      let best = -Infinity;
-      let winnerId = null;
-      round.playerIds.forEach(id => {
-        const total = this.totalStableford(round.scores[id] || [], pars);
-        if (total > best) { best = total; winnerId = id; }
-      });
-      return winnerId;
+      const totals = round.playerIds.map(id => ({ id, score: this.totalStableford(round.scores[id] || [], pars) }));
+      const best   = Math.max(...totals.map(t => t.score));
+      return totals.filter(t => t.score === best).map(t => t.id);
     }
 
-    return null;
+    return round.winner ? [round.winner] : [];
   }
 };
