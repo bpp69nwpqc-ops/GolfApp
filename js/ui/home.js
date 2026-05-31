@@ -30,6 +30,7 @@ const HomeUI = {
           ${lastRound ? this._lastRoundCard(lastRound) : this._emptyLastRound()}
           ${profile ? this._handicapCard(profile) : this._emptyHandicapCard()}
         </div>
+        <div style="text-align:center;padding:8px 0 16px;font-size:10px;color:var(--text-secondary);opacity:0.5">v9</div>
       </div>
     `;
   },
