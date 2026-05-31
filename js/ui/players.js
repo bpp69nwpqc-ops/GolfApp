@@ -76,14 +76,15 @@ const PlayersUI = {
         </header>
         <div class="form-body">
           <div class="form-group">
-            <label class="form-label">Name</label>
-            <input id="player-name" type="text" class="form-input" placeholder="Player name"
+            <label class="form-label">Naam</label>
+            <input id="player-name" type="text" class="form-input" placeholder="bijv. Jan De Smet"
                    value="${player ? this._esc(player.name) : ''}" autocomplete="off">
           </div>
           <div class="form-group">
-            <label class="form-label">Nickname <span style="font-weight:400;color:var(--text-secondary)">(optional, shown on scorecard)</span></label>
-            <input id="player-nickname" type="text" class="form-input" placeholder="e.g. Papa"
+            <label class="form-label">Bijnaam <span style="font-weight:400;color:var(--text-secondary)">(optioneel)</span></label>
+            <input id="player-nickname" type="text" class="form-input" placeholder="bijv. Papa, Bro, Koen…"
                    value="${player && player.nickname ? this._esc(player.nickname) : ''}" autocomplete="off">
+            <div style="font-size:11px;color:var(--text-secondary);margin-top:4px">Wordt gebruikt op de scorecard in plaats van de volledige naam</div>
           </div>
           <div class="form-group">
             <label class="form-label">Handicap Index</label>

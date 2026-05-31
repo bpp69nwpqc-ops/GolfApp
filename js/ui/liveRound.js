@@ -385,7 +385,7 @@ const LiveRoundUI = {
               <div class="player-tee-row card">
                 <div class="player-tee-identity">
                   <div class="player-avatar-sm" style="background-color:${p.avatarColor}">${initials}</div>
-                  <span class="player-tee-name">${p.name}</span>
+                  <span class="player-tee-name">${getDisplayName(p)}</span>
                 </div>
                 <div class="tee-mini-row">
                   ${course.tees.map(tee => {
