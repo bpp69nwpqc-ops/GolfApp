@@ -1749,8 +1749,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  padding: 12px 14px;
+  gap: 8px;
+  padding: 10px 14px;
   margin-bottom: 8px;
 }
 
@@ -1758,7 +1758,7 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
-  min-width: 100px;
+  flex-shrink: 0;
 }
 
 .player-tee-name {
@@ -1769,36 +1769,51 @@ body {
 
 .tee-mini-row {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .tee-mini-btn {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid transparent;
+  border: 3px solid transparent;
   background: none;
   padding: 0;
   transition: border-color 0.15s;
+  flex-shrink: 0;
 }
 
 .tee-mini-btn.selected {
   border-color: var(--text-primary);
-  box-shadow: 0 0 0 2px var(--white), 0 0 0 4px var(--text-primary);
 }
 
 .tee-mini-circle {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
 }
 
 .tee-mini-circle.white-tee {
-  border: 1.5px solid #ccc;
+  border: 1.5px solid #bbb;
+}
+
+/* ─── Tee color dot in meters display ─── */
+.tee-cycle-dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  vertical-align: middle;
+}
+
+.tee-cycle-dot.white-tee {
+  border: 1.5px solid #bbb;
 }
 
 /* ─── Extra strokes badge (live scorecard) ─── */

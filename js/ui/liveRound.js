@@ -528,7 +528,10 @@ const LiveRoundUI = {
               <span class="hole-info-value">${holeInfo.par}</span>
             </div>
             <div class="hole-info-item" data-action="cycle-meters" style="cursor:pointer;user-select:none">
-              <span class="hole-info-label" id="meters-label">${getDisplayName(refPlayer)}</span>
+              <span class="hole-info-label">
+                <span class="tee-cycle-dot ${refTee === 'white' ? 'white-tee' : ''}" id="meters-label"
+                      style="background:${TEE_COLORS[refTee] || '#888'}"></span>
+              </span>
               <span class="hole-info-value" id="meters-display">${refMeters}</span>
             </div>
             <div class="hole-info-item">
@@ -886,7 +889,10 @@ const LiveRoundUI = {
         const mEl = document.getElementById('meters-display');
         const lEl = document.getElementById('meters-label');
         if (mEl) mEl.textContent = hd ? hd.meters : '—';
-        if (lEl) lEl.textContent = getDisplayName(p);
+        if (lEl) {
+          lEl.style.background = TEE_COLORS[tee] || '#888';
+          lEl.className = 'tee-cycle-dot' + (tee === 'white' ? ' white-tee' : '');
+        }
         break;
       }
 
