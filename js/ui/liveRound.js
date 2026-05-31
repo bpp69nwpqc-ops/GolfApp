@@ -24,6 +24,12 @@ function buildScorecardTable(round, players, pars, scoreTotals, winnerId) {
   const total = round.totalHoles;
   const is18  = total === 18;
 
+  // Handicap setup
+  const siArray = getCourseSIs(round.clubId, round.courseId, total, round.playedTwice, round.tee);
+  const chMap   = {};
+  players.forEach(p => { chMap[p.id] = computePlayerCH(p, round); });
+  const getExtra = (pid, hi) => Scoring.holeStrokeAllowance(chMap[pid] || 0, siArray[hi], total);
+
   const playerHeaders = players.map(p => {
     return `<th class="col-player">
       <span class="player-th-name">${p.name}</span>
@@ -31,11 +37,12 @@ function buildScorecardTable(round, players, pars, scoreTotals, winnerId) {
   }).join('');
 
   const scoreCell = (pid, hi) => {
-    const par = pars[hi];
-    const raw = (round.scores[pid] || [])[hi];
-    const val = (raw !== null && raw !== undefined) ? raw : par;
+    const par   = pars[hi];
+    const raw   = (round.scores[pid] || [])[hi];
+    const val   = (raw !== null && raw !== undefined) ? raw : par;
+    const extra = isSf ? getExtra(pid, hi) : 0;
     if (isSf) {
-      const pts = Scoring.getStablefordPoints(val - par);
+      const pts = Scoring.getStablefordPoints(val - par - extra);
       const cls = pts >= 3 ? ' under' : pts <= 1 ? ' over' : '';
       return `<td class="cell-s${cls}">${pts}</td>`;
     }
@@ -56,10 +63,18 @@ function buildScorecardTable(round, players, pars, scoreTotals, winnerId) {
   const subRow = (label, from, to) => {
     const subPar = pars.slice(from - 1, to).reduce((a, b) => a + b, 0);
     const cells  = players.map(p => {
-      const slice  = (round.scores[p.id] || []).slice(from - 1, to);
+      if (isSf) {
+        const val = Array.from({ length: to - from + 1 }, (_, k) => {
+          const hi    = from - 1 + k;
+          const gross = (round.scores[p.id] || [])[hi];
+          const g     = gross !== null && gross !== undefined ? gross : pars[hi];
+          return Scoring.getStablefordPoints(g - pars[hi] - getExtra(p.id, hi));
+        }).reduce((a, b) => a + b, 0);
+        return `<td class="cell-s">${val}pt</td>`;
+      }
+      const slice = (round.scores[p.id] || []).slice(from - 1, to);
       const pSlice = pars.slice(from - 1, to);
-      const val    = isSf ? Scoring.totalStableford(slice, pSlice) : Scoring.totalGross(slice, pSlice);
-      return `<td class="cell-s">${isSf ? val + 'pt' : val}</td>`;
+      return `<td class="cell-s">${Scoring.totalGross(slice, pSlice)}</td>`;
     }).join('');
     return `<tr class="row-sub">
       <td class="cell-h">${label}</td>
@@ -80,7 +95,16 @@ function buildScorecardTable(round, players, pars, scoreTotals, winnerId) {
 
   const totPar   = pars.reduce((a, b) => a + b, 0);
   const totCells = players.map(p => {
-    const val  = scoreTotals[p.id];
+    let val;
+    if (isSf) {
+      val = Array.from({ length: total }, (_, hi) => {
+        const gross = (round.scores[p.id] || [])[hi];
+        const g     = gross !== null && gross !== undefined ? gross : pars[hi];
+        return Scoring.getStablefordPoints(g - pars[hi] - getExtra(p.id, hi));
+      }).reduce((a, b) => a + b, 0);
+    } else {
+      val = scoreTotals[p.id];
+    }
     const disp = isSf ? val + 'pt' : val;
     return `<td class="cell-s">${disp}</td>`;
   }).join('');
@@ -453,6 +477,13 @@ const LiveRoundUI = {
       }
     });
 
+    // Extra strokes per player for this hole
+    const playerExtras = {};
+    players.forEach(p => {
+      const ch = computePlayerCH(p, round);
+      playerExtras[p.id] = Scoring.holeStrokeAllowance(ch, holeInfo.si, round.totalHoles);
+    });
+
     return `
       <div class="scorecard-screen">
         <div class="scorecard-header">
@@ -478,7 +509,7 @@ const LiveRoundUI = {
         </div>
 
         <div class="players-area">
-          ${players.map(p => this._playerCard(p, round, holeNum, holeInfo.par)).join('')}
+          ${players.map(p => this._playerCard(p, round, holeNum, holeInfo.par, playerExtras[p.id])).join('')}
         </div>
 
         <div class="scorecard-footer">
@@ -499,11 +530,14 @@ const LiveRoundUI = {
     `;
   },
 
-  _playerCard(player, round, holeNum, par) {
-    const initials = player.name.split(' ').map(n => n[0] || '').join('').toUpperCase().slice(0, 2);
-    const score    = round.scores[player.id] ? round.scores[player.id][holeNum - 1] : par;
+  _playerCard(player, round, holeNum, par, extraStrokes) {
+    const initials  = player.name.split(' ').map(n => n[0] || '').join('').toUpperCase().slice(0, 2);
+    const score     = round.scores[player.id] ? round.scores[player.id][holeNum - 1] : par;
     const dispScore = score !== null ? score : par;
-    const badge    = Scoring.getScoreBadge(dispScore, par);
+    const badge     = Scoring.getScoreBadge(dispScore, par);
+    const extraBadge = extraStrokes > 0
+      ? `<span class="extra-strokes-badge">+${extraStrokes} ${extraStrokes === 1 ? 'slag' : 'slagen'}</span>`
+      : '';
     return `
       <div class="player-scorecard-card" id="player-card-${player.id}">
         <div class="player-card-top">
@@ -511,7 +545,10 @@ const LiveRoundUI = {
             <div class="player-avatar-sm" style="background-color:${player.avatarColor}">${initials}</div>
             <div>
               <div class="player-name-text">${player.name}</div>
-              <div class="player-hcp-text">${player.currentHandicap != null ? 'HCP ' + player.currentHandicap.toFixed(1) : ''}</div>
+              <div class="player-hcp-text">
+                ${player.currentHandicap != null ? 'HCP ' + player.currentHandicap.toFixed(1) : ''}
+                ${extraBadge}
+              </div>
             </div>
           </div>
           <div class="score-badge" id="badge-${player.id}"

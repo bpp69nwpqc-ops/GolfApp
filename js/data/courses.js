@@ -140,3 +140,23 @@ function getCoursePars(clubId, courseId, totalHoles) {
   if (!course) return [];
   return Array.from({ length: totalHoles }, (_, i) => course.holeData[i % course.holeData.length].par);
 }
+
+function getCourseSIs(clubId, courseId, totalHoles, playedTwice, tee) {
+  return Array.from({ length: totalHoles }, (_, i) => {
+    const hd = getHoleData(clubId, courseId, i + 1, playedTwice, tee);
+    return hd ? hd.si : (i + 1);
+  });
+}
+
+function computePlayerCH(player, round) {
+  if (player.currentHandicap == null) return 0;
+  const course = getCourse(round.clubId, round.courseId);
+  if (!course || !course.slope || !course.courseRating) {
+    return Math.round(player.currentHandicap * round.totalHoles / 18);
+  }
+  const tee   = round.tee;
+  const slope = (course.slope.men && course.slope.men[tee]) || (course.slope.ladies && course.slope.ladies[tee]) || 113;
+  const cr    = (course.courseRating.men && course.courseRating.men[tee]) || (course.courseRating.ladies && course.courseRating.ladies[tee]) || course.par;
+  const ch18  = Scoring.calcCourseHandicap(player.currentHandicap, slope, cr, course.par);
+  return round.totalHoles === 9 ? Math.round(ch18 / 2) : ch18;
+}
