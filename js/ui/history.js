@@ -17,7 +17,7 @@ const HistoryUI = {
       <div>
         <header class="page-header">
           <div class="page-header-row">
-            <h1 class="page-title">History</h1>
+            <h1 class="page-title"><i class="ti ti-clock"></i> History</h1>
             ${profileHeaderBtn()}
           </div>
         </header>

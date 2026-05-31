@@ -10,7 +10,7 @@ const StatsUI = {
       <div>
         <header class="page-header">
           <div class="page-header-row">
-            <h1 class="page-title">Stats</h1>
+            <h1 class="page-title"><i class="ti ti-chart-bar"></i> Stats</h1>
             ${profileHeaderBtn()}
           </div>
         </header>
@@ -30,7 +30,7 @@ const StatsUI = {
       <div>
         <header class="page-header">
           <div class="page-header-row">
-            <h1 class="page-title">Stats</h1>
+            <h1 class="page-title"><i class="ti ti-chart-bar"></i> Stats</h1>
             ${profileHeaderBtn()}
           </div>
         </header>
@@ -52,7 +52,7 @@ const StatsUI = {
       <div>
         <header class="page-header">
           <div class="page-header-row">
-            <h1 class="page-title">Stats</h1>
+            <h1 class="page-title"><i class="ti ti-chart-bar"></i> Stats</h1>
             ${profileHeaderBtn()}
           </div>
         </header>

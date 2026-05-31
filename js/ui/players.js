@@ -16,7 +16,7 @@ const PlayersUI = {
       <div class="players-screen">
         <header class="page-header">
           <div class="page-header-row">
-            <h1 class="page-title">Friends</h1>
+            <h1 class="page-title"><i class="ti ti-users"></i> Friends</h1>
           </div>
         </header>
         <div class="content-body">
