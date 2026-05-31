@@ -27,7 +27,7 @@ function buildScorecardTable(round, players, pars, scoreTotals, winnerId) {
   const playerHeaders = players.map(p => {
     const isWin = p.id === winnerId;
     return `<th class="col-player">
-      <span class="player-th-name${isWin ? ' is-winner' : ''}">${p.name}</span>
+      <span class="player-th-name${isWin ? ' is-winner' : ''}">${isWin ? '🏆 ' : ''}${p.name}</span>
     </th>`;
   }).join('');
 
@@ -83,7 +83,8 @@ function buildScorecardTable(round, players, pars, scoreTotals, winnerId) {
   const totCells = players.map(p => {
     const isWin = p.id === winnerId;
     const val   = scoreTotals[p.id];
-    return `<td class="cell-s${isWin ? ' cell-winner' : ''}">${isSf ? val + 'pt' : val}</td>`;
+    const disp  = isSf ? val + 'pt' : val;
+    return `<td class="cell-s${isWin ? ' cell-winner' : ''}">${isWin ? '🏆 ' : ''}${disp}</td>`;
   }).join('');
 
   return `

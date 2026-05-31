@@ -745,26 +745,28 @@ body {
 
 /* Format grid */
 .format-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .format-card {
-  padding: 14px 12px;
+  padding: 14px 16px;
   background: var(--white);
   border: 0.5px solid var(--border);
   border-radius: var(--radius-card);
   cursor: pointer;
   transition: border-color 0.15s, box-shadow 0.15s;
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }
 
 .format-card.selected {
   border-color: var(--green-primary);
   box-shadow: 0 0 0 1px var(--green-primary);
+  background: #F0FAF6;
 }
 
 .format-card-name {
@@ -775,9 +777,10 @@ body {
 }
 
 .format-card-desc {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--text-secondary);
   line-height: 1.4;
+  text-align: right;
 }
 
 /* Player select */
@@ -1360,10 +1363,10 @@ body {
 }
 
 .scorecard-table-v thead th {
-  background: var(--green-primary);
+  background: var(--green-dark);
   color: rgba(255,255,255,0.9);
   text-align: center;
-  border-right: 0.5px solid rgba(255,255,255,0.15);
+  border-right: 0.5px solid rgba(255,255,255,0.12);
 }
 
 .scorecard-table-v th.col-label {
@@ -1377,10 +1380,10 @@ body {
 }
 
 .scorecard-table-v th.col-player {
-  height: 80px;
+  height: 72px;
   vertical-align: bottom;
-  padding: 0 4px 8px;
-  min-width: 40px;
+  padding: 0 4px 6px;
+  min-width: 44px;
 }
 
 .player-th-name {
@@ -1391,40 +1394,45 @@ body {
   font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
-  max-height: 72px;
-  color: rgba(255,255,255,0.9);
+  max-height: 64px;
+  color: rgba(255,255,255,0.85);
 }
 
 .player-th-name.is-winner {
-  color: var(--gold);
+  color: #FFD97D;
 }
 
 .scorecard-table-v tbody td {
-  padding: 7px 4px;
+  padding: 6px 4px;
   text-align: center;
   border-bottom: 0.5px solid var(--border);
   border-right: 0.5px solid var(--border);
 }
 
+.scorecard-table-v tr:nth-child(even) td.cell-s {
+  background-color: #FAFAF8;
+}
+
 .scorecard-table-v td.cell-h {
-  background: #f5f2ed;
+  background: #EEEBE5;
   color: var(--text-secondary);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
-  width: 28px;
+  width: 26px;
 }
 
 .scorecard-table-v td.cell-p {
-  background: #f5f2ed;
-  color: var(--text-secondary);
+  background: #EEEBE5;
+  color: #6B6660;
   font-size: 12px;
-  font-weight: 400;
+  font-weight: 500;
   width: 28px;
 }
 
 .scorecard-table-v td.cell-s {
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
+  color: var(--text-primary);
 }
 
 .scorecard-table-v td.cell-s.under {
@@ -1438,28 +1446,38 @@ body {
 }
 
 .scorecard-table-v tr.row-sub td {
-  background: #edf2ed;
+  background: #E8F0E8;
   color: var(--green-dark);
   font-size: 11px;
   font-weight: 700;
-  border-top: 1px solid #c0d4c0;
+  border-top: 1px solid #C8DCC8;
+  border-bottom: 1px solid #C8DCC8;
 }
 
 .scorecard-table-v tr.row-sub td.cell-h,
 .scorecard-table-v tr.row-sub td.cell-p {
-  background: #d4e6d4;
+  background: #D6E8D6;
 }
 
 .scorecard-table-v tr.row-tot td {
-  background: var(--green-primary);
-  color: var(--white);
+  background: var(--green-dark);
+  color: rgba(255,255,255,0.9);
   font-size: 13px;
-  font-weight: 800;
-  border-color: var(--green-dark);
+  font-weight: 700;
+  border-color: transparent;
+  padding: 9px 4px;
+}
+
+.scorecard-table-v tr.row-tot td.cell-h,
+.scorecard-table-v tr.row-tot td.cell-p {
+  color: rgba(255,255,255,0.6);
+  font-size: 10px;
+  font-weight: 600;
 }
 
 .scorecard-table-v tr.row-tot td.cell-winner {
-  background: var(--gold);
+  color: #FFD97D;
+  font-weight: 800;
 }
 
 /* ─── Profile Header Button ─── */
@@ -1727,3 +1745,39 @@ body {
 
 .course-stat-avg.under { color: var(--score-under-tx); }
 .course-stat-avg.over  { color: var(--score-over-tx); }
+
+/* ─── Home formats card ─── */
+.formats-card { margin-top: 0; }
+
+.format-info-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 0.5px solid var(--border);
+}
+.format-info-row:last-child { border-bottom: none; }
+
+.format-info-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 110px;
+}
+
+.format-info-icon {
+  font-size: 15px;
+  color: var(--green-primary);
+}
+
+.format-info-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.format-info-desc {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}

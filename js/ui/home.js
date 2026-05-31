@@ -29,8 +29,9 @@ const HomeUI = {
           </button>
           ${lastRound ? this._lastRoundCard(lastRound) : this._emptyLastRound()}
           ${profile ? this._handicapCard(profile) : this._emptyHandicapCard()}
+          ${this._formatsCard()}
         </div>
-        <div style="text-align:center;padding:8px 0 16px;font-size:10px;color:var(--text-secondary);opacity:0.5">v9</div>
+        <div style="text-align:center;padding:8px 0 16px;font-size:10px;color:var(--text-secondary);opacity:0.5">v10</div>
       </div>
     `;
   },
@@ -79,6 +80,30 @@ const HomeUI = {
       <div class="card empty-card" style="cursor:pointer" data-action="open-profile">
         <div class="card-label">Handicap Index</div>
         <div class="empty-text">Set up your profile to track handicap</div>
+      </div>
+    `;
+  },
+
+  _formatsCard() {
+    const formats = [
+      { name: 'Strokeplay',  icon: 'ti-pencil',      desc: 'Tel alle slagen op. Laagste totaal wint.' },
+      { name: 'Stableford',  icon: 'ti-star',         desc: 'Punten per hole op basis van je handicap. Meeste punten wint.' },
+      { name: 'Matchplay',   icon: 'ti-sword',        desc: 'Hole per hole duelleren. Meeste holes gewonnen wint.' },
+      { name: 'Scramble',    icon: 'ti-users',        desc: 'Team speelt vanuit de beste bal van iedereen.' },
+      { name: 'Best Ball',   icon: 'ti-trophy',       desc: 'Elke speler speelt zijn eigen bal; beste score per hole telt.' },
+    ];
+    return `
+      <div class="card formats-card">
+        <div class="card-label">Formats</div>
+        ${formats.map(f => `
+          <div class="format-info-row">
+            <div class="format-info-left">
+              <i class="ti ${f.icon} format-info-icon"></i>
+              <span class="format-info-name">${f.name}</span>
+            </div>
+            <span class="format-info-desc">${f.desc}</span>
+          </div>
+        `).join('')}
       </div>
     `;
   },
