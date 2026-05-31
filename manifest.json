@@ -1,0 +1,14 @@
+{
+  "name": "Masters",
+  "short_name": "Masters",
+  "description": "Golf scorecard app for Belgian golfers",
+  "start_url": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0F6E56",
+  "theme_color": "#0F6E56",
+  "icons": [
+    { "src": "Logo_GolfApp_Masters.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "Logo_GolfApp_Masters.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

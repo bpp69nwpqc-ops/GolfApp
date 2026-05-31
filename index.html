@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+  <!-- PWA / iOS -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Masters">
+  <meta name="theme-color" content="#0F6E56">
+  <link rel="apple-touch-icon" href="Logo_GolfApp_Masters.png">
+  <link rel="manifest" href="manifest.json">
+
+  <title>Masters</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Tabler Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+
+  <!-- App styles -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div id="app">
+    <div id="content"></div>
+
+    <nav id="bottom-nav">
+      <button class="nav-tab active" data-tab="home">
+        <i class="ti ti-home"></i>
+        <span>Home</span>
+      </button>
+      <button class="nav-tab" data-tab="players">
+        <i class="ti ti-users"></i>
+        <span>Friends</span>
+      </button>
+      <button class="nav-tab" data-tab="live">
+        <i class="ti ti-circle-dot"></i>
+        <span>Live</span>
+      </button>
+      <button class="nav-tab" data-tab="stats">
+        <i class="ti ti-chart-bar"></i>
+        <span>Stats</span>
+      </button>
+      <button class="nav-tab" data-tab="history">
+        <i class="ti ti-clock"></i>
+        <span>History</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- Data & utilities -->
+  <script src="js/data/courses.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/scoring.js"></script>
+
+  <!-- UI modules -->
+  <script src="js/ui/profile.js"></script>
+  <script src="js/ui/home.js"></script>
+  <script src="js/ui/history.js"></script>
+  <script src="js/ui/players.js"></script>
+  <script src="js/ui/stats.js"></script>
+  <script src="js/ui/liveRound.js"></script>
+
+  <!-- App controller -->
+  <script src="js/app.js"></script>
+
+  <!-- Service Worker -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>
